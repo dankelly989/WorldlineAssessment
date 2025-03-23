@@ -31,16 +31,17 @@ class InvoicingService():
     
     #Post Invoice
     async def post_invoice(self, invoice_request: InvoiceRequest, card: Card):
-        # Returns InvoiceDB, Customer DB objects joined
+        # inserts row into db table and returns new row data
         invoice_customer = post_invoice_request(invoice_request)
         if invoice_customer is None:
             raise HTTPException(status_code=404, detail="No record found with this UUID")
         
+        # Map to pydantic model
         invoice_response: InvoiceResponse = map_db_to_invoice_response(invoice_customer[0], invoice_customer[1])
         if card is None:
             return 200, invoice_response.model_dump(exclude_none=True, by_alias=True)
         else:
-            return self.fake_pay.pay_invoice(invoice_response.id, card)
+            return self.pay_invoice(invoice_response.id, card)
     
     #Get all
     async def get_invoices(self, status: Status):
@@ -69,8 +70,6 @@ class InvoicingService():
         if invoice_customer is None:
             raise HTTPException(status_code=404, detail="Problem updating invoice")
         #return updated invoice
-        #mask card number
-        card.number = len(card.number[:-4])*"*"+card.number[-4:]
-        invoice_response: InvoiceResponse = map_db_to_invoice_response(invoice_customer[0], invoice_customer[1])
-        invoice_response.card = card
+        card.number = len(card.number[:-4])*"*"+card.number[-4:]     #mask card number
+        invoice_response: InvoiceResponse = map_db_to_invoice_response(invoice_customer[0], invoice_customer[1], card)
         return 200, invoice_response.model_dump(exclude_none=True, by_alias=True)
