@@ -73,11 +73,11 @@ def get_joined_invoice_customer(status: Status, db=None):
     if(status):
         invoice_customer = db.query(InvoiceDB, CustomerDB).join(
             CustomerDB, CustomerDB.customer_id == InvoiceDB.customer_id
-        ).filter(InvoiceDB.invoice_status == str(status))
+        ).limit(10).filter(InvoiceDB.invoice_status == str(status))
     else:
         invoice_customer = db.query(InvoiceDB, CustomerDB).join(
             CustomerDB, CustomerDB.customer_id == InvoiceDB.customer_id
-        )
+        ).limit(10)
     return invoice_customer
 
 @with_db_session 
