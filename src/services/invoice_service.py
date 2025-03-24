@@ -3,7 +3,6 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from src.models.invoice import InvoiceResponse
-from src.models.invoice import MultipleInvoiceResponse
 from src.models.model_mappers import map_db_to_invoice_response
 from src.db.invoice_manager_db import get_joined_invoice_customer_by_id
 from src.db.invoice_manager_db import post_invoice_request
